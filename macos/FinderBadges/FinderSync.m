@@ -83,9 +83,9 @@ static NSString *ReadBadge(NSURL *url) {
 }
 
 - (void)endObservingDirectoryAtURL:(NSURL *)url {
-    NSString *prefix = [url.path stringByAppendingString:@"/"];
+    NSString *dir = url.path;
     for (NSURL *item in self.requested.allObjects) {
-        if ([item isEqual:url] || [item.path hasPrefix:prefix]) {
+        if ([item.URLByDeletingLastPathComponent.path isEqualToString:dir]) {
             [self.requested removeObject:item];
             [self.displayed removeObjectForKey:item];
         }
