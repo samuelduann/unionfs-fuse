@@ -72,24 +72,31 @@ static NSString *ReadBadge(NSURL *url) {
     }
 }
 
+/* Finder calls these on its own thread; hop to the main queue, which owns
+ * requested/displayed/registered.
+ */
 - (void)requestBadgeIdentifierForURL:(NSURL *)url {
-    [self.requested addObject:url];
-    dispatch_async(self.worker, ^{
-        NSString *badge = ReadBadge(url);
-        dispatch_async(dispatch_get_main_queue(), ^{
-            if ([self.requested containsObject:url]) [self applyBadge:badge toURL:url];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.requested addObject:url];
+        dispatch_async(self.worker, ^{
+            NSString *badge = ReadBadge(url);
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if ([self.requested containsObject:url]) [self applyBadge:badge toURL:url];
+            });
         });
     });
 }
 
 - (void)endObservingDirectoryAtURL:(NSURL *)url {
     NSString *dir = url.path;
-    for (NSURL *item in self.requested.allObjects) {
-        if ([item.URLByDeletingLastPathComponent.path isEqualToString:dir]) {
-            [self.requested removeObject:item];
-            [self.displayed removeObjectForKey:item];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        for (NSURL *item in self.requested.allObjects) {
+            if ([item.URLByDeletingLastPathComponent.path isEqualToString:dir]) {
+                [self.requested removeObject:item];
+                [self.displayed removeObjectForKey:item];
+            }
         }
-    }
+    });
 }
 
 /* Poll only requested items, including lower-layer changes that don't generate
