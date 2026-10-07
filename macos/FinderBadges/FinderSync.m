@@ -52,7 +52,7 @@ static NSString *ReadBadge(NSURL *url) {
     if (badge.length && ![self.registered containsObject:badge]) {
         NSImage *image = [[NSImage alloc] initWithSize:NSMakeSize(64, 64)];
         [image lockFocus];
-        [[NSColor colorWithSRGBRed:0.12 green:0.35 blue:0.78 alpha:1] setFill];
+        [[NSColor colorWithSRGBRed:1 green:0.64 blue:0.32 alpha:1] setFill];
         [[NSBezierPath bezierPathWithOvalInRect:NSMakeRect(0, 0, 64, 64)] fill];
         CGFloat fontSize = MIN(42.0, 88.0 / badge.length);
         NSDictionary *attributes = @{
