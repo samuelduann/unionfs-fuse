@@ -4,6 +4,8 @@ project(unionfs-fuse VERSION 3.4
                      DESCRIPTION "user-space implementation of union filesystem (with help of fuse)"
                      LANGUAGES C)
 
+include(CTest)
+
 INCLUDE(CheckIncludeFiles)
 
 # Set a default build type for single-configuration

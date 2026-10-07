@@ -15,6 +15,7 @@ typedef enum searchflag {
 bool branch_contains_path(int branch, const char *path, bool *is_dir);
 bool branch_contains_file_or_parent_dir(int branch, const char *path);
 int find_rorw_branch(const char *path);
+int branch_has_underlying_copy(const char *path, int branch);
 int find_lowest_rw_branch(int branch_ro);
 int find_rw_branch_cutlast(const char *path);
 int __find_rw_branch_cutlast(const char *path, int rw_hint);

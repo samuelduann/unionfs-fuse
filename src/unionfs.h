@@ -10,6 +10,9 @@
 #define PATHLEN_MAX 1024
 #define HIDETAG "_HIDDEN~"
 
+/* Computed, read-only; value is a one-based branch number and optional '+'. */
+#define UNIONFS_BRANCH_BADGE_XATTR "user.unionfs.branch-badge"
+
 #define METANAME ".unionfs"
 #define METADIR (METANAME  "/") // string concetanation!
 

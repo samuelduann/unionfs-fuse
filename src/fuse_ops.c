@@ -842,6 +842,20 @@ static int unionfs_getxattr(const char *path, const char *name, char *value, siz
 	int i = find_rorw_branch(path);
 	if (i == -1) RETURN(-errno);
 
+	if (strcmp(name, UNIONFS_BRANCH_BADGE_XATTR) == 0) {
+#if __APPLE__
+		if (position != 0) RETURN(-EINVAL);
+#endif
+		int copies = branch_has_underlying_copy(path, i);
+		if (copies < 0) RETURN(copies);
+		char badge[32];
+		int len = snprintf(badge, sizeof(badge), "%d%s", i + 1, copies ? "+" : "");
+		if (size == 0) RETURN(len);
+		if (size < (size_t)len) RETURN(-ERANGE);
+		memcpy(value, badge, len);
+		RETURN(len);
+	}
+
 	char p[PATHLEN_MAX];
 	if (BUILD_PATH(p, uopt.branches[i].path, path)) RETURN(-ENAMETOOLONG);
 
@@ -878,6 +892,7 @@ static int unionfs_listxattr(const char *path, char *list, size_t size) {
 
 static int unionfs_removexattr(const char *path, const char *name) {
 	DBG("%s\n", path);
+	if (strcmp(name, UNIONFS_BRANCH_BADGE_XATTR) == 0) RETURN(-EPERM);
 
 	int i = find_rw_branch_cow(path);
 	if (i == -1) RETURN(-errno);
@@ -902,6 +917,7 @@ static int unionfs_setxattr(const char *path, const char *name, const char *valu
 static int unionfs_setxattr(const char *path, const char *name, const char *value, size_t size, int flags) {
 #endif
 	DBG("%s\n", path);
+	if (strcmp(name, UNIONFS_BRANCH_BADGE_XATTR) == 0) RETURN(-EPERM);
 
 	int i = find_rw_branch_cow(path);
 	if (i == -1) RETURN(-errno);

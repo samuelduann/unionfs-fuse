@@ -67,3 +67,10 @@ it was. ;-)
 To run the vagrant-based macos tests, just execute `./test_vagrant_macos.sh`.
 
 This depends on a custom vagrant box. You can use the one I've built or you can build your own - all the required stuff should be in `macos_vagrant` directory.
+
+Finder branch badges (macOS)
+---------------------------
+
+An optional Finder extension displays the branch number on file and folder icons,
+with `+` on files and folders that have an eligible underlying copy (for example, `2+`).
+See [build and activation instructions](macos/FinderBadges/README.md).

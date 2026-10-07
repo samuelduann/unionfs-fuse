@@ -152,6 +152,34 @@ int find_rorw_branch(const char *path) {
 	RETURN(res);
 }
 
+/* Return 1 for an eligible lower copy, 0 for none, or -errno.
+ * A whiteout hides branches below its own layer, not entries in that layer.
+ * Directories match directories; non-directories match non-directories.
+ */
+int branch_has_underlying_copy(const char *path, int branch) {
+	char p[PATHLEN_MAX];
+	struct stat st;
+	if (branch < 0 || branch >= uopt.nbranches) return -EINVAL;
+	if (BUILD_PATH(p, uopt.branches[branch].path, path)) return -ENAMETOOLONG;
+	if (lstat(p, &st) != 0) return -errno;
+	bool is_dir = S_ISDIR(st.st_mode);
+
+	for (int i = branch; i < uopt.nbranches; i++) {
+		if (i > branch) {
+			if (BUILD_PATH(p, uopt.branches[i].path, path)) return -ENAMETOOLONG;
+			if (lstat(p, &st) == 0) {
+				if (!!S_ISDIR(st.st_mode) == is_dir) return 1;
+			} else if (errno != ENOENT && errno != ENOTDIR) {
+				return -errno;
+			}
+		}
+		int hidden = path_hidden(path, i);
+		if (hidden < 0) return hidden;
+		if (hidden) return 0;
+	}
+	return 0;
+}
+
 /**
  * Find a writable branch. If file does not exist, we check for
  * the parent directory.
