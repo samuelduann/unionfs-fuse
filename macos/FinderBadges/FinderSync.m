@@ -38,7 +38,7 @@ static NSString *ReadBadge(NSURL *url) {
         _registered = [NSMutableSet set];
         [FIFinderSyncController defaultController].directoryURLs = [NSSet set];
         __weak UnionFSFinderSync *weakSelf = self;
-        _timer = [NSTimer scheduledTimerWithTimeInterval:3 repeats:YES block:^(NSTimer *timer) {
+        _timer = [NSTimer scheduledTimerWithTimeInterval:5 repeats:YES block:^(NSTimer *timer) {
             (void)timer;
             [weakSelf refresh];
         }];
